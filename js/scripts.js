@@ -1,81 +1,84 @@
-document.addEventListener("DOMContentLoaded", function() {
-    // Event listener for scrolling to ticket booking section
-    const buyTicketBtn = document.querySelector("#buyTicketBtn");
-    const ticketBook = document.querySelector('#ticketBooking');
-    buyTicketBtn.addEventListener('click', function () {
-        const showTicketBook = ticketBook.clientHeight;
-        window.scrollTo({
-            top: showTicketBook,
-            behavior: "smooth"
-        });
-    });
 
-    // Event listener for seat selection
-    const allSeat = document.getElementsByClassName('seats');
-    let count = 40;
-    let booking = 0;
-    for (const seat of allSeat) {
-        seat.addEventListener("click", handleSeatSelection);
+    const getAllSeats = document.getElementsByClassName('seats');
+
+    for (const seat of getAllSeats) {
+        seat.addEventListener('click', function (event) {
+            const selectedSeatName = event.target.innerText
+
+            const seatCount = getTargetedElement('booking-Seat');
+            if (seatCount >= 4) {
+                alert("You can not select more then four.");
+                return;
+            }
+            event.target.classList.add("bg-emerald-600")
+
+            const selectSeat = getTargetedElement('booking-Seat');
+            document.getElementById('booking-Seat').innerText = selectSeat + 1;
+
+            const totalSeat = getTargetedElement('seatLeft')
+            document.getElementById("seatLeft").innerText = totalSeat - 1
+        
+            const seatLavel = 'Economic';
+            const seatPrice = '550';
+
+            const div = document.createElement('div');
+            div.classList.add('flex')
+            div.classList.add('justify-between')
+            div.classList.add('px-4')
+
+            const p1 = document.createElement('p');
+            const p2 = document.createElement('p');
+            const p3 = document.createElement('p');
+
+            p1.innerText = selectedSeatName;
+            p2.innerText = seatLavel;
+            p3.innerText = seatPrice;
+
+            div.appendChild(p1);
+            div.appendChild(p2);
+            div.appendChild(p3);
+            selectedSeat.appendChild(div);
+
+            totalPrice()
+            grandTotalPrice()
+        })
     }
 
-    // Function to handle seat selection
-    function handleSeatSelection(event) {
-        count = count - 1;
-        document.getElementById('seatLeft').innerText = count;
+    // total discount function 
+    function grandTotalPrice(status) {
+        const updatTotalCost = getTargetedElement('total-Price');
+        const couponCode = document.getElementById('couponCode').value;
+    
 
-        const selectSeat = this.innerText;
-        const showSeat = document.getElementById('selectedSeat');
-
-        const div = document.createElement("div");
-        div.innerHTML = ` <div class="flex items-center justify-between px-4">
-                                    <p>${selectSeat}</p>
-                                    <p>Economic</p>
-                                    <p>550</p>
-                                </div>`;
-        showSeat.appendChild(div);
-
-        // Apply background color to the selected seat
-        if (this.classList.contains('selected')) {
-            this.classList.add('bg-emerald-600');
+    
+        if (couponCode == 'NEW15') {
+            const new15Price = updatTotalCost * .15;
+            document.getElementById('grand-Total-Price').innerText = updatTotalCost - new15Price;
+            document.getElementById('couponCode').value = ''
+        } else if (couponCode == 'Couple 20') {
+            const couple20Price = updatTotalCost * .20;
+            document.getElementById('grand-Total-Price').innerText = updatTotalCost - couple20Price;
+            document.getElementById('couponCode').value = ''
         } else {
-            this.classList.add('bg-emerald-300');
+            document.getElementById('couponCode').value = ''
+            document.getElementById('grand-Total-Price').innerText = updatTotalCost;
+        
         }
-
-        const selectSingleSeat = document.getElementById('bookingSeat');
-        const bookAmount = booking += 1;
-        selectSingleSeat.innerText = bookAmount;
-
-        if (bookAmount > 4) {
-            alert("Booking limit exceeded (maximum 4 seats)");
-            return;
-        }
-
-        // Total ticket Price
-        const totalPrice = document.getElementById('totalPrice').innerText = bookAmount * 550;
-        this.classList.add('selected-seat');
-        this.classList.add('bg-emerald-300');
-        return totalPrice;
+    
     }
-});
 
-// Function for applying discount based on coupon code
-function grandTotal(event) {
-    const couponInput = document.getElementById('couponCode').value;
-    const totalPriceElement = document.getElementById('totalPrice');
-    const totalPrice = parseFloat(totalPriceElement.innerText);
-    const grandTotalElement = document.getElementById('grandTotalPrice');
-    const applyBtn = document.getElementById('applyBtn');
-
-    // Applying discount based on coupon code
-    if (couponInput === 'NEW15') {
-        const discountPrice = Math.round(0.15 * totalPrice);
-        grandTotalElement.innerText = totalPrice - discountPrice;
-        applyBtn.classList.add("hidden");
-    } else if (couponInput === 'Couple 20') {
-        const discountPrice = Math.round(0.20 * totalPrice);
-        grandTotalElement.innerText = totalPrice - discountPrice;
-        applyBtn.classList.add("hidden");
-    } else {
-        grandTotalElement.innerText = totalPrice;
-    }
+// total Price function 
+function totalPrice() {
+    const selectSeat = getTargetedElement('booking-Seat');
+    const totalSeatCost =  selectSeat * 550;
+    document.getElementById('total-Price').innerText = totalSeatCost;
 }
+// get common element function 
+function getTargetedElement(id) {
+    const targetedElement = document.getElementById(id).innerText
+    const targetdeValue = parseInt(targetedElement)
+    return targetdeValue
+}
+
+const result = getTargetedElement('booking-Seat')
+// console.log(result);
